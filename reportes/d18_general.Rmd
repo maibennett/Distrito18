@@ -151,45 +151,36 @@ library(stringr)
 library(leaflet)
 #hrbrthemes::update_geom_font_defaults(family=font_rc)
 
+##### Data del censo
+d_census = read.csv("https://raw.githubusercontent.com/maibennett/Distrito18/main/data/censo/Cantidad-de-Personas-por-Sexo-y-Edad_d18.csv?token=AFJAWROULO4VI6DO3BEWWMK7RS22K")
 
-#Traditional diff in diff:
+edad_out = c("0 a 4", "5 a 9", "10 a 14", "15 a 19","Total Comunal")
+d_census = d_census[!(d_census$edad %in% edad_out),]
 
-Y1 = c(2,4)
-Y0 = c(1,2)
-Y1c = c(2,3)
+edad_old = c("80 a 84","85 a 89","90 a 94", "95 a 99", "100 o mas")
+d_census$edad[d_census$edad %in% edad_old] = "80 o mas"
 
-d = data.frame(cbind(c(0,1,0,1),c(Y0,Y1),c(0,0,1,1)))
-names(d) = c("t","Y","Z")
+d_census$edad = factor(d_census$edad)
 
-ggplot(d, aes(x = t, y = Y, group=factor(Z), color=factor(Z)), fill="white") +
-  geom_line(lwd=1.1) +
-  geom_point(size=3)+
-  geom_vline(xintercept = 0.5,lty=2,col="dark grey",lwd=1)+
-  scale_color_manual(values=c("#F89441","#900DA4")) +
-  
-  annotate("text",x=0.4,y=4.7,label = "Pre-Intervention", size=6, colour="dark grey",hjust=1, family="Fira Sans Condensed")+
-  annotate("text",x=0.6,y=4.7,label = "Post-Intervention", size=6, colour="dark grey",hjust=0, family="Fira Sans Condensed")+
-  
-    annotate("rect",xmin=-1, xmax=-0.4,ymin=0,ymax=1,alpha=1, color="dark grey", fill="white")+
-    annotate("segment",x=-0.95,y=0.3,xend=-0.8,yend=0.3,lty=1,col="#F89441",lwd=1) +
-    annotate("text",x=-0.77,y=0.3,label = "Control", size=4, colour="black",hjust=0, 
-             family="Fira Sans Condensed")+
-    annotate("segment",x=-0.95,y=0.7,xend=-0.8,yend=0.7,lty=1,col="#900DA4",lwd=1) +
-    annotate("text",x=-0.77,y=0.7,label = "Treat", size=4, colour="black",hjust=0, 
-             family="Fira Sans Condensed")+
-  
+##### Data del servel
+d_inscritos = read.csv()
+
+ggplot(d, aes(x = edad, y = total), fill="white") +
+  stat_summary(fun=sum, geom = "bar",col="#F89441",lwd=1.5,fill=alpha("#F89441",0.5))+
+
   theme_bw()+
   theme_ipsum_fsc(plot_title_face = "bold") + #plain 
-  xlab("Time") + ylab("Outcome")+
-  xlim(-1,2) + ylim(0,5)+
+  xlab("Edad (años)") + ylab("Num. habitantes")+ggtitle("Habitantes por grupo etario - D18")+
   theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
         axis.line = element_line(colour = "dark grey"))+
+  
   theme(axis.title.x = element_text(size=16),#margin = margin(t = 10, r = 0, b = 0, l = 0)),
-        axis.text.x = element_text(size=10),
+        axis.text.x = element_text(size=10, angle = 45,
+                                   hjust=1,vjust=1,margin=margin(0.1,0,0,0)),
         axis.title.y = element_text(size=16),#margin = margin(t = 0, r = 10, b = 0, l = 0)),
         axis.text.y = element_text(size=10),legend.position="none",
         legend.title = element_blank(),
