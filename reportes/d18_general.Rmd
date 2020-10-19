@@ -229,18 +229,21 @@ ggplot(d_aux, aes(x = rango_edad, y = total, color = data, fill=data),
 
 d_votantes2017$partido = str_to_title(d_votantes2017$partido)
 
+#Unidad constituyente reúne a los miembros de Convergencia Progresista (PR, PS, PPD), la Democracia Cristiana, el PRO y Ciudadanos
+#De esta lista "Amplitud" es derecha, "Progresista" y "Todos" es concerta, y todo lo demás es delictivo izquierda FA+PC+Locos Addams
+
 d_votantes2017$partido_6 = NA
-izq_extra = c("Amplitud","Andha Chile","Comunista De Chile","Ecologista Verde",
+izq_extra = c("Andha Chile","Comunista De Chile","Ecologista Verde",
               "Humanista","Igualdad","Izquierda Ciudadana De Chile",
-              "Mas-Region","Pais","Poder Ciudadano","Progresista","Regionalista Independiente",
-              "Revolucion Democratica","Todos","Democracia Regional Patagonica")
+              "Mas-Region","Pais","Poder Ciudadano","Regionalista Independiente",
+              "Revolucion Democratica","Democracia Regional Patagonica")
 
 centro_indep = c("Liberal De Chile","Ciudadanos")
 
 concertacion = c("Democrata Cristiano","Por La Democracia","Radical Socialdemocrata",
-                 "Socialista De Chile")
+                 "Socialista De Chile","Progresista","Todos")
 
-centro_derecha = c("Renovacion Nacional","Evolucion Politica")
+centro_derecha = c("Renovacion Nacional","Evolucion Politica","Amplitud")
   
 derecha = c("Union Democrata Independiente","Union Patriotica")
 
@@ -275,7 +278,7 @@ ggplot(d_partidos2017_sum, aes(x = partido_6, y = n, color = partido_6, fill=par
 
   theme_bw()+
   theme_ipsum_fsc(plot_title_face = "bold") + #plain 
-  xlab("Edad (años)") + ylab("Num. inscritos/votantes")+ggtitle("Inscritos y votantes por tendencia de partido - D18")+
+  xlab("Tendencia") + ylab("Num. inscritos/votantes")+ggtitle("Inscritos y votantes por tendencia de partido - D18")+
   theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -295,7 +298,7 @@ ggplot(d_partidos2017_sum, aes(x = partido_6, y = n, color = partido_6, fill=par
 
 ```
 ---
-# Distribución de partidos políticos: Solo insrcritos
+# Distribución de partidos políticos: Solo inscritos
 ```{r pp2, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
 
@@ -311,7 +314,7 @@ ggplot(d_partidos2017_sum[d_partidos2017_sum$partido_6!="Sin Partido",],
 
   theme_bw()+
   theme_ipsum_fsc(plot_title_face = "bold") + #plain 
-  xlab("Edad (años)") + ylab("Num. inscritos/votantes")+ggtitle("Inscritos y votantes por tendencia de partido - D18")+
+  xlab("Tendencia") + ylab("Num. inscritos/votantes")+ggtitle("Inscritos y votantes por tendencia de partido - D18")+
   theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
