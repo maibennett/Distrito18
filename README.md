@@ -1,3 +1,1 @@
-# Distrito18
- 
- Numeros electorales para distrito 18
+# READ ME HERE
