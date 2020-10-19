@@ -155,7 +155,7 @@ library(gtools)
 #hrbrthemes::update_geom_font_defaults(family=font_rc)
 
 ##### Data del censo
-d_census = read.csv("https://raw.githubusercontent.com/maibennett/Distrito18/main/data/censo/Cantidad-de-Personas-por-Sexo-y-Edad_d18.csv")
+d_census = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data/censo/Cantidad-de-Personas-por-Sexo-y-Edad_d18.csv")
 
 edad_out = c("0 a 4", "5 a 9", "10 a 14", "15 a 19","Total Comunal")
 d_census = d_census[!(d_census$edad %in% edad_out),]
@@ -169,13 +169,13 @@ d_census$data = "Censo 2017"
 d_census$nom_comuna = str_to_title(d_census$nom_comuna)
 
 ##### Data del servel
-d_inscritos = read.csv("https://raw.githubusercontent.com/maibennett/Distrito18/main/data/servel/padron2020.csv")
+d_inscritos = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data/servel/padron2020.csv")
 
 d_inscritos_sum = d_inscritos %>% count(comuna, rango_edad)
 names(d_inscritos_sum) = c("nom_comuna","rango_edad","total")
 d_inscritos_sum$data = "Inscritos 2020"
 
-d_votantes2017 = read.csv("https://raw.githubusercontent.com/maibennett/Distrito18/main/data/servel/votantes2017.csv")
+d_votantes2017 = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data/servel/votantes2017.csv")
 
 d_inscritos2017_sum = d_votantes2017 %>% count(comuna, rango_edad)
 names(d_inscritos2017_sum) = c("nom_comuna","rango_edad","total")
