@@ -2,7 +2,7 @@
 
 ### Link
 
-[slide link](d18_general.html)
+[slide link](reportes/d18_general.html)
 
 ### Embed
 
@@ -24,7 +24,7 @@
 </style>
 
 <div class="resp-container">
-    <iframe class="testiframe" src="https://maibennett.github.io/d18/d18_general.html">
+    <iframe class="testiframe" src="https://maibennett.github.io/d18/reportes/d18_general.html">
       Oops! Your browser doesn't suppor this.
     </iframe>
 </div>
