@@ -131,7 +131,7 @@ style_mono_accent(
 
 # Caracterización por Edad Distrito 18
 
-```{r dd, fig.height=6, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+```{r edad, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 library(dplyr)
 library(tidyr)
 library(RColorBrewer)
@@ -166,31 +166,45 @@ d_census$edad[d_census$edad %in% edad_old] = "80 o mas"
 d_census = rename(d_census,rango_edad = edad)
 d_census$data = "Censo 2017"
 
+d_census$nom_comuna = str_to_title(d_census$nom_comuna)
+
 ##### Data del servel
 d_inscritos = read.csv("https://raw.githubusercontent.com/maibennett/Distrito18/main/data/servel/padron2020.csv")
-
-d_inscritos$comuna = str_to_title(d_inscritos$comuna)
 
 d_inscritos_sum = d_inscritos %>% count(comuna, rango_edad)
 names(d_inscritos_sum) = c("nom_comuna","rango_edad","total")
 d_inscritos_sum$data = "Inscritos 2020"
 
-d_aux = smartbind(d_census,d_inscritos_sum)
-d_aux = d_aux %>% add_row(data = "Censo 2017", rango_edad = "18 a 19", total = NA)
+d_votantes2017 = read.csv("https://raw.githubusercontent.com/maibennett/Distrito18/main/data/servel/votantes2017.csv")
+
+d_inscritos2017_sum = d_votantes2017 %>% count(comuna, rango_edad)
+names(d_inscritos2017_sum) = c("nom_comuna","rango_edad","total")
+d_inscritos2017_sum$data = "Inscritos 2017"
+
+d_votantes2017_sum = d_votantes2017[d_votantes2017$sufragio=="sufragó",] %>% count(comuna, rango_edad)
+names(d_votantes2017_sum) = c("nom_comuna","rango_edad","total")
+d_votantes2017_sum$data = "Votantes 2017"
+
+
+d_aux = smartbind(d_inscritos2017_sum,d_votantes2017_sum,d_inscritos_sum)
+#d_aux = d_aux %>% add_row(data = "Censo 2017", rango_edad = "18 a 19", total = NA)
 d_aux$rango_edad = factor(d_aux$rango_edad)
 
 d_aux = d_aux %>% group_by(data,rango_edad) %>% 
   summarise(total = sum(total))
 
-ggplot(d_aux, aes(x = rango_edad, y = total, color = factor(data), fill=factor(data)), 
+d_aux$data = factor(d_aux$data, levels = c("Inscritos 2017","Votantes 2017","Inscritos 2020"))
+
+ggplot(d_aux, aes(x = rango_edad, y = total, color = data, fill=data), 
        fill="white") +
   geom_bar(stat = "identity", lwd=1.5,position=position_dodge(), width = 0.8)+
-  scale_color_manual(values=c("#900DA4","#F89441")) + 
-  scale_fill_manual(values=c(alpha("#900DA4",0.5),alpha("#F89441",0.5))) +
+  scale_color_manual(values=c("#900DA4","#F89441","#FCCE25")) + 
+  scale_fill_manual(values=c(alpha("#900DA4",0.5),alpha("#F89441",0.5),
+                             alpha("#FCCE25",0.5))) +
 
   theme_bw()+
   theme_ipsum_fsc(plot_title_face = "bold") + #plain 
-  xlab("Edad (años)") + ylab("Num. habitantes")+ggtitle("Habitantes por grupo etario - D18")+
+  xlab("Edad (años)") + ylab("Num. inscritos/votantes")+ggtitle("Inscritos y votantes por grupo etario - D18")+
   theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
@@ -207,5 +221,112 @@ ggplot(d_aux, aes(x = rango_edad, y = total, color = factor(data), fill=factor(d
         legend.text = element_text(size=10),
         legend.background = element_rect(fill="white",colour ="white"),
         title = element_text(size=14))
+
+```
+---
+# Distribución de partidos políticos
+```{r pp1, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+d_votantes2017$partido = str_to_title(d_votantes2017$partido)
+
+d_votantes2017$partido_6 = NA
+izq_extra = c("Amplitud","Andha Chile","Comunista De Chile","Ecologista Verde",
+              "Humanista","Igualdad","Izquierda Ciudadana De Chile",
+              "Mas-Region","Pais","Poder Ciudadano","Progresista","Regionalista Independiente",
+              "Revolucion Democratica","Todos","Democracia Regional Patagonica")
+
+centro_indep = c("Liberal De Chile","Ciudadanos")
+
+concertacion = c("Democrata Cristiano","Por La Democracia","Radical Socialdemocrata",
+                 "Socialista De Chile")
+
+centro_derecha = c("Renovacion Nacional","Evolucion Politica")
+  
+derecha = c("Union Democrata Independiente","Union Patriotica")
+
+d_votantes2017$partido_6[d_votantes2017$partido %in% izq_extra] = "Izquierda"
+d_votantes2017$partido_6[d_votantes2017$partido %in% concertacion] = "Ex-Concertacion"
+d_votantes2017$partido_6[d_votantes2017$partido %in% centro_indep] = "Centro-Indep"
+d_votantes2017$partido_6[d_votantes2017$partido %in% centro_derecha] = "Centro-Derecha"
+d_votantes2017$partido_6[d_votantes2017$partido %in% derecha] = "Derecha"
+d_votantes2017$partido_6[d_votantes2017$partido %in% "Sin Partido"] = "Sin Partido"
+
+d_votantes2017$data = "Inscritos 2017"
+
+d_partidos2017_sum = d_votantes2017 %>% count(data,partido_6)
+
+d_partidos2017_voto_sum = d_votantes2017[d_votantes2017$sufragio=="sufragó",] %>% count(data,partido_6)
+d_partidos2017_voto_sum$data = "Votantes 2017"
+
+d_partidos2017_sum = d_partidos2017_sum %>% add_row(d_partidos2017_voto_sum)
+
+d_partidos2017_sum$partido_6 = factor(d_partidos2017_sum$partido_6,
+                                      levels = c("Sin Partido","Izquierda","Ex-Concertacion",
+                                                 "Centro-Indep","Centro-Derecha","Derecha"))
+
+ggplot(d_partidos2017_sum, aes(x = partido_6, y = n, color = partido_6, fill=partido_6), 
+       fill="white") +
+  geom_bar(stat = "identity", lwd=1.5,position=position_dodge(), width = 0.8)+
+  scale_color_manual(values=c("#0D0887","#5601A4","#900DA4",
+                              "#BF3984","#F89441","#FCCE25")) + 
+  scale_fill_manual(values=c(alpha("#0D0887",0.5),alpha("#5601A4",0.5),
+                             alpha("#900DA4",0.5), alpha("#BF3984",0.5),
+                             alpha("#F89441",0.5),alpha("#FCCE25",0.5))) +
+
+  theme_bw()+
+  theme_ipsum_fsc(plot_title_face = "bold") + #plain 
+  xlab("Edad (años)") + ylab("Num. inscritos/votantes")+ggtitle("Inscritos y votantes por tendencia de partido - D18")+
+  theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.line = element_line(colour = "dark grey"))+
+  
+  theme(axis.title.x = element_text(size=16),#margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.text.x = element_text(size=10, angle = 45,
+                                   hjust=1,vjust=1,margin=margin(0.1,0,0,0)),
+        axis.title.y = element_text(size=16),#margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.text.y = element_text(size=10),legend.position=c(0.95,1),
+        legend.title = element_blank(),
+        legend.text = element_text(size=10),
+        legend.background = element_rect(fill="white",colour ="white"),
+        title = element_text(size=14)) + facet_grid(cols=vars(factor(data)))
+
+```
+---
+# Distribución de partidos políticos: Solo insrcritos
+```{r pp2, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+
+ggplot(d_partidos2017_sum[d_partidos2017_sum$partido_6!="Sin Partido",], 
+       aes(x = partido_6, y = n, color = partido_6, fill=partido_6), 
+       fill="white") +
+  geom_bar(stat = "identity", lwd=1.5,position=position_dodge(), width = 0.8)+
+  scale_color_manual(values=c("#5601A4","#900DA4",
+                              "#BF3984","#F89441","#FCCE25")) + 
+  scale_fill_manual(values=c(alpha("#5601A4",0.5),
+                             alpha("#900DA4",0.5), alpha("#BF3984",0.5),
+                             alpha("#F89441",0.5),alpha("#FCCE25",0.5))) +
+
+  theme_bw()+
+  theme_ipsum_fsc(plot_title_face = "bold") + #plain 
+  xlab("Edad (años)") + ylab("Num. inscritos/votantes")+ggtitle("Inscritos y votantes por tendencia de partido - D18")+
+  theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.line = element_line(colour = "dark grey"))+
+  
+  theme(axis.title.x = element_text(size=16),#margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.text.x = element_text(size=10, angle = 45,
+                                   hjust=1,vjust=1,margin=margin(0.1,0,0,0)),
+        axis.title.y = element_text(size=16),#margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.text.y = element_text(size=10),legend.position=c(0.95,1),
+        legend.title = element_blank(),
+        legend.text = element_text(size=10),
+        legend.background = element_rect(fill="white",colour ="white"),
+        title = element_text(size=14)) + facet_grid(cols=vars(factor(data)))
 
 ```
