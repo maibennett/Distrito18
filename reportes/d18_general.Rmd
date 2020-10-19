@@ -129,7 +129,7 @@ style_mono_accent(
 #FCCE25
 ```
 
-# Caracterización por Edad Distrito 18
+# Caracterización por edad Distrito 18
 
 ```{r edad, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 library(dplyr)
