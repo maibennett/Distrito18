@@ -337,6 +337,8 @@ ggplot(d_partidos2017_sum[d_partidos2017_sum$partido_6!="Sin Partido",],
 
 ---
 # Mapa electoral por año: 2020
+
+.pull-left[
 ```{r map2020, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 library(plotly)
 library(leaflet)
@@ -383,3 +385,9 @@ m <- leaflet(D18) %>%
 m
 
 ```
+]
+.pull-right[
+- Linares es la comuna con mayor % de votación.
+
+- Retiro, Longaví, y Chanco son las con menor participación.
+]
