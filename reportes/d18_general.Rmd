@@ -335,12 +335,12 @@ ggplot(d_partidos2017_sum[d_partidos2017_sum$partido_6!="Sin Partido",],
 ```
 
 ---
-# Mapa electoral por año
-```{r pp2, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+# Mapa electoral por año: 2020
+```{r map2020, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 library(plotly)
 library(leaflet)
 library(OpenStreetMap)
-
+library(rgdal)
 
 d = read.csv("https://raw.githubusercontent.com/maibennett/participacion/main/data/d2012-2020_clean.csv")
 
@@ -348,34 +348,37 @@ comunas_d18 = unique(d_census$cod_comuna)
 
 d = d[d$cod_comuna %in% comunas_d18,]
 
-ggplot(d_partidos2017_sum[d_partidos2017_sum$partido_6!="Sin Partido",], 
-       aes(x = partido_6, y = n, color = partido_6, fill=partido_6), 
-       fill="white") +
-  geom_bar(stat = "identity", lwd=1.5,position=position_dodge(), width = 0.8)+
-  scale_color_manual(values=c("#5601A4","#900DA4",
-                              "#BF3984","#F89441","#FCCE25")) + 
-  scale_fill_manual(values=c(alpha("#5601A4",0.5),
-                             alpha("#900DA4",0.5), alpha("#BF3984",0.5),
-                             alpha("#F89441",0.5),alpha("#FCCE25",0.5))) +
+d18 <- readOGR("shp/d18.shp",
+  layer = "d18",verbose = FALSE)
 
-  theme_bw()+
-  theme_ipsum_fsc(plot_title_face = "bold") + #plain 
-  xlab("Tendencia") + ylab("Num. inscritos/votantes")+ggtitle("Inscritos y votantes por tendencia de partido - D18")+
-  theme(plot.margin=unit(c(1,1,1.5,1.2),"cm"),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        panel.grid.major.y = element_blank(),
-        panel.grid.minor.y = element_blank(),
-        axis.line = element_line(colour = "dark grey"))+
-  
-  theme(axis.title.x = element_text(size=16),#margin = margin(t = 10, r = 0, b = 0, l = 0)),
-        axis.text.x = element_text(size=10, angle = 45,
-                                   hjust=1,vjust=1,margin=margin(0.1,0,0,0)),
-        axis.title.y = element_text(size=16),#margin = margin(t = 0, r = 10, b = 0, l = 0)),
-        axis.text.y = element_text(size=10),legend.position=c(0.95,1),
-        legend.title = element_blank(),
-        legend.text = element_text(size=10),
-        legend.background = element_rect(fill="white",colour ="white"),
-        title = element_text(size=14)) + facet_grid(cols=vars(factor(data)))
+PRO <- sp::CRS('+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0')
+D18 <- sp::spTransform(d18,PRO)
+
+D18 = merge(D18, d[d$year==2020,], by='cod_comuna')
+
+pal <- colorNumeric(c("#0D0887", "#5601A4",
+                      "#900DA4","#BF3984","#E16462",
+                      "#F89441","#FCCE25"), 
+                    seq(0.3,0.5,0.05))
+
+D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+                    "<br/>% Votantes: ",D18$participacion)
+
+m <- leaflet(D18) %>%
+    addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    fillColor = ~pal(participacion),
+    highlightOptions = highlightOptions(color = "white", weight = 2,
+      bringToFront = TRUE), 
+    label = ~lapply(label, htmltools::HTML), 
+    labelOptions = labelOptions(
+    style = list("font-weight" = "normal", padding = "3px 8px"),
+    textsize = "15px",
+    direction = "auto"))
+   # ) %>%
+  #  addMarkers(lng=-71.6011589, lat=-35.845689, popup="Linares")
+
+m
 
 ```
