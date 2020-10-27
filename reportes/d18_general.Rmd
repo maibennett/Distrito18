@@ -478,7 +478,7 @@ m
 
 
 ---
-# Mapa electoral por año: 2016
+# Mapa participación electoral por año: 2016
 
 .pull-left[
 ```{r map2016, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
@@ -534,7 +534,7 @@ m
 
 
 ---
-# Mapa electoral por año: 2013
+# Mapa participación electoral por año: 2013
 
 .pull-left[
 ```{r map2013, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
@@ -587,7 +587,7 @@ m
 ]
 
 ---
-# Mapa electoral por año: 2012
+# Mapa participación electoral por año: 2012
 
 
 ```{r map2012, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
