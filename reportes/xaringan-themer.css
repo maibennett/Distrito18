@@ -404,6 +404,3 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   text-align: left;
   font-family: Fira Sans;
 }
-.leaflet {
-  margin: auto;
-}
