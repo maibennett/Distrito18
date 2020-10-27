@@ -115,7 +115,8 @@ style_mono_accent(
                                                                       "font-size" = "25px",
                                                                       "display" = "table",
                                                                       "text-align" = "left",
-                                                                      "font-family" = "Fira Sans")
+                                                                      "font-family" = "Fira Sans"),
+   ".leaflet" = list("margin" = "auto")
   )
 )
 
