@@ -395,7 +395,8 @@ m <- leaflet(D18) %>%
      labelOptions = labelOptions(
      style = list("font-weight" = "normal", padding = "3px 8px"),
      textsize = "15px",
-     direction = "top")
+     direction = "right"),
+    options = pathOptions(clickable = TRUE)
     )%>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.73,0.1),
@@ -448,7 +449,7 @@ m <- leaflet(D18) %>%
      labelOptions = labelOptions(
      style = list("font-weight" = "normal", padding = "3px 8px"),
      textsize = "15px",
-     direction = "top")
+     direction = "right")
     )%>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.73,0.1),
@@ -502,7 +503,7 @@ m <- leaflet(D18) %>%
      labelOptions = labelOptions(
      style = list("font-weight" = "normal", padding = "3px 8px"),
      textsize = "15px",
-     direction = "top")
+     direction = "right")
     )%>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.73,0.1),
@@ -556,7 +557,7 @@ m <- leaflet(D18) %>%
      labelOptions = labelOptions(
      style = list("font-weight" = "normal", padding = "3px 8px"),
      textsize = "15px",
-     direction = "top")
+     direction = "right")
     )%>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.73,0.1),
@@ -572,7 +573,7 @@ m
 - La participación era mucho mayor el 2013 que en años siguientes, entre 50% y 60% para la mayoría de las comunas.
 
 - **Linares** y **Cauquenes**, las dos comunas con mayor % de inscritos, tienden a tener menor partiicipación que el resto.
-
+]
 
 ---
 # Mapa electoral por año: 2012
@@ -609,7 +610,7 @@ m <- leaflet(D18) %>%
      labelOptions = labelOptions(
      style = list("font-weight" = "normal", padding = "3px 8px"),
      textsize = "15px",
-     direction = "top")
+     direction = "right")
     )%>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.73,0.1),
@@ -623,12 +624,10 @@ m
 ]
 .pull-right[
 - A pesar de que la participación es la más alta en el distrito, comparado con el periodo 2013-2020, **Linares** sigue siendo al comuna con menor participación.
-
+]
 ---
 background-position: 50% 50%
 class: left, bottom, inverse
 .big[
 Evolución de votaciones según tendencia política
-]
-
 ]
