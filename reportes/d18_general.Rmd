@@ -130,6 +130,7 @@ style_mono_accent(
 #FCCE25
 ```
 
+
 # Caracterización por edad Distrito 18
 
 ```{r edad, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
@@ -336,6 +337,12 @@ ggplot(d_partidos2017_sum[d_partidos2017_sum$partido_6!="Sin Partido",],
 ```
 
 ---
+background-position: 50% 50%
+class: left, bottom, inverse
+.big[
+Mapas de participación electoral 2012-2020
+]
+---
 # Mapa electoral por año: 2020
 
 .pull-left[
@@ -344,6 +351,7 @@ library(plotly)
 library(leaflet)
 library(OpenStreetMap)
 library(rgdal)
+library(rgeos)
 
 d = read.csv("https://raw.githubusercontent.com/maibennett/participacion/main/data/d2012-2020_clean.csv")
 
@@ -359,13 +367,22 @@ D18 <- sp::spTransform(d18,PRO)
 
 D18 = merge(D18, d[d$year==2020,], by='cod_comuna')
 
+D18$votantes_distrito = round(D18$n/sum(D18$n),3)
+
 pal <- colorNumeric(c("#0D0887", "#5601A4",
                       "#900DA4","#BF3984","#E16462",
                       "#F89441","#FCCE25"), 
-                    seq(0.3,0.5,0.05))
+                    seq(0.3,0.75,0.05))
 
 D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
-                    "<br/>% Votantes: ",D18$participacion)
+                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
+                    "<br/>% Participación: ",D18$participacion)
+
+centers <- data.frame(gCentroid(D18, byid = TRUE))
+D18$x <- centers$x
+D18$y <- centers$y
+
+#
 
 m <- leaflet(D18) %>%
     addTiles() %>%  # Add default OpenStreetMap map tiles
@@ -373,21 +390,245 @@ m <- leaflet(D18) %>%
     opacity = 1.0, fillOpacity = 0.5,
     fillColor = ~pal(participacion),
     highlightOptions = highlightOptions(color = "white", weight = 2,
-      bringToFront = TRUE), 
-    label = ~lapply(label, htmltools::HTML), 
-    labelOptions = labelOptions(
-    style = list("font-weight" = "normal", padding = "3px 8px"),
-    textsize = "15px",
-    direction = "auto"))
-   # ) %>%
-  #  addMarkers(lng=-71.6011589, lat=-35.845689, popup="Linares")
+      bringToFront = TRUE),
+      label = ~lapply(label, htmltools::HTML), 
+     labelOptions = labelOptions(
+     style = list("font-weight" = "normal", padding = "3px 8px"),
+     textsize = "15px",
+     direction = "top")
+    )%>%
+  addLegend(position = "bottomleft",
+            pal = pal, values = seq(0.3,0.73,0.1),
+            title = "Participacion",
+            opacity = 1
+  ) 
 
 m
 
 ```
 ]
 .pull-right[
-- Linares es la comuna con mayor % de votación.
+- **Linares** es la comuna con **mayor** % de votación en 2020.
 
-- Retiro, Longaví, y Chanco son las con menor participación.
+- **Retiro, Longaví,** y **Chanco** son las con **menor** participación en el plebiscito.
+]
+
+
+---
+# Mapa electoral por año: 2017
+
+.pull-left[
+```{r map2017, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+
+D18 <- sp::spTransform(d18,PRO)
+
+D18 = merge(D18, d[d$year==2017,], by='cod_comuna')
+
+D18$votantes_distrito = round(D18$n/sum(D18$n),3)
+
+D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
+                    "<br/>% Participación: ",round(D18$participacion,3))
+
+centers <- data.frame(gCentroid(D18, byid = TRUE))
+D18$x <- centers$x
+D18$y <- centers$y
+
+#
+
+m <- leaflet(D18) %>%
+    addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    fillColor = ~pal(participacion),
+    highlightOptions = highlightOptions(color = "white", weight = 2,
+      bringToFront = TRUE),
+      label = ~lapply(label, htmltools::HTML), 
+     labelOptions = labelOptions(
+     style = list("font-weight" = "normal", padding = "3px 8px"),
+     textsize = "15px",
+     direction = "top")
+    )%>%
+  addLegend(position = "bottomleft",
+            pal = pal, values = seq(0.3,0.73,0.1),
+            title = "Participacion",
+            opacity = 1
+  ) 
+
+m
+
+```
+]
+.pull-right[
+- **Pelluhue** es la comuna con **mayor** % de votación en 2017.
+
+- **Linares** tiene una participación del 44% (muy parecida al plebiscito 2020).
+]
+
+
+---
+# Mapa electoral por año: 2016
+
+.pull-left[
+```{r map2016, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+
+D18 <- sp::spTransform(d18,PRO)
+
+D18 = merge(D18, d[d$year==2016,], by='cod_comuna')
+
+D18$votantes_distrito = round(D18$n/sum(D18$n),3)
+
+
+D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
+                    "<br/>% Participación: ",round(D18$participacion,3))
+
+centers <- data.frame(gCentroid(D18, byid = TRUE))
+D18$x <- centers$x
+D18$y <- centers$y
+
+#
+
+m <- leaflet(D18) %>%
+    addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    fillColor = ~pal(participacion),
+    highlightOptions = highlightOptions(color = "white", weight = 2,
+      bringToFront = TRUE),
+      label = ~lapply(label, htmltools::HTML), 
+     labelOptions = labelOptions(
+     style = list("font-weight" = "normal", padding = "3px 8px"),
+     textsize = "15px",
+     direction = "top")
+    )%>%
+  addLegend(position = "bottomleft",
+            pal = pal, values = seq(0.3,0.73,0.1),
+            title = "Participacion",
+            opacity = 1
+  ) 
+
+m
+
+```
+]
+.pull-right[
+- **Pelluhue** es la comuna con **mayor** % de votación en 2016.
+
+- **Linares** tiene una participación **baja** comparada con el resto de las comunas.
+]
+
+
+---
+# Mapa electoral por año: 2013
+
+.pull-left[
+```{r map2013, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+
+D18 <- sp::spTransform(d18,PRO)
+
+D18 = merge(D18, d[d$year==2013,], by='cod_comuna')
+
+D18$votantes_distrito = round(D18$n/sum(D18$n),3)
+
+
+D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
+                    "<br/>% Participación: ",round(D18$participacion,3))
+
+centers <- data.frame(gCentroid(D18, byid = TRUE))
+D18$x <- centers$x
+D18$y <- centers$y
+
+#
+
+m <- leaflet(D18) %>%
+    addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    fillColor = ~pal(participacion),
+    highlightOptions = highlightOptions(color = "white", weight = 2,
+      bringToFront = TRUE),
+      label = ~lapply(label, htmltools::HTML), 
+     labelOptions = labelOptions(
+     style = list("font-weight" = "normal", padding = "3px 8px"),
+     textsize = "15px",
+     direction = "top")
+    )%>%
+  addLegend(position = "bottomleft",
+            pal = pal, values = seq(0.3,0.73,0.1),
+            title = "Participacion",
+            opacity = 1
+  ) 
+
+m
+
+```
+]
+.pull-right[
+- La participación era mucho mayor el 2013 que en años siguientes, entre 50% y 60% para la mayoría de las comunas.
+
+- **Linares** y **Cauquenes**, las dos comunas con mayor % de inscritos, tienden a tener menor partiicipación que el resto.
+
+
+---
+# Mapa electoral por año: 2012
+
+.pull-left[
+```{r map2012, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+
+D18 <- sp::spTransform(d18,PRO)
+
+D18 = merge(D18, d[d$year==2012,], by='cod_comuna')
+
+D18$votantes_distrito = round(D18$n/sum(D18$n),3)
+
+
+D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
+                    "<br/>% Participación: ",round(D18$participacion,3))
+
+centers <- data.frame(gCentroid(D18, byid = TRUE))
+D18$x <- centers$x
+D18$y <- centers$y
+
+#
+
+m <- leaflet(D18) %>%
+    addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    fillColor = ~pal(participacion),
+    highlightOptions = highlightOptions(color = "white", weight = 2,
+      bringToFront = TRUE),
+      label = ~lapply(label, htmltools::HTML), 
+     labelOptions = labelOptions(
+     style = list("font-weight" = "normal", padding = "3px 8px"),
+     textsize = "15px",
+     direction = "top")
+    )%>%
+  addLegend(position = "bottomleft",
+            pal = pal, values = seq(0.3,0.73,0.1),
+            title = "Participacion",
+            opacity = 1
+  ) 
+
+m
+
+```
+]
+.pull-right[
+- A pesar de que la participación es la más alta en el distrito, comparado con el periodo 2013-2020, **Linares** sigue siendo al comuna con menor participación.
+
+---
+background-position: 50% 50%
+class: left, bottom, inverse
+.big[
+Evolución de votaciones según tendencia política
+]
+
 ]
