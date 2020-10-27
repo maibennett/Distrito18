@@ -115,11 +115,11 @@ style_mono_accent(
                                                                       "font-size" = "25px",
                                                                       "display" = "table",
                                                                       "text-align" = "left",
-                                                                      "font-family" = "Fira Sans"),
-   ".leaflet" = list("margin" = "auto")
+                                                                      "font-family" = "Fira Sans")
+   
   )
 )
-
+#".leaflet" = list("margin" = "auto"),
 #,"li" = list("font-size" = "150%")
 #    "li" = list("font-size" = "110%"),
 #    "ul" = list("font-size" = "110%"),
