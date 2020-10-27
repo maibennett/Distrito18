@@ -399,9 +399,9 @@ m <- leaflet(D18) %>%
     options = pathOptions(clickable = TRUE)
     )%>%
   addLegend(position = "bottomleft",
-            pal = pal, values = seq(0.3,0.73,0.1),
+            pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
-            opacity = 1
+            opacity = 1, bins = 5
   ) 
 
 m
@@ -452,9 +452,9 @@ m <- leaflet(D18) %>%
      direction = "right")
     )%>%
   addLegend(position = "bottomleft",
-            pal = pal, values = seq(0.3,0.73,0.1),
+            pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
-            opacity = 1
+            opacity = 1, bins = 5
   ) 
 
 m
@@ -506,9 +506,9 @@ m <- leaflet(D18) %>%
      direction = "right")
     )%>%
   addLegend(position = "bottomleft",
-            pal = pal, values = seq(0.3,0.73,0.1),
+            pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
-            opacity = 1
+            opacity = 1, bins = 5
   ) 
 
 m
@@ -560,9 +560,9 @@ m <- leaflet(D18) %>%
      direction = "right")
     )%>%
   addLegend(position = "bottomleft",
-            pal = pal, values = seq(0.3,0.73,0.1),
+            pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
-            opacity = 1
+            opacity = 1, bins = 5
   ) 
 
 m
@@ -613,9 +613,9 @@ m <- leaflet(D18) %>%
      direction = "right")
     )%>%
   addLegend(position = "bottomleft",
-            pal = pal, values = seq(0.3,0.73,0.1),
+            pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
-            opacity = 1
+            opacity = 1, bins = 5
   ) 
 
 m
