@@ -115,7 +115,10 @@ style_mono_accent(
                                                                       "font-size" = "25px",
                                                                       "display" = "table",
                                                                       "text-align" = "left",
-                                                                      "font-family" = "Fira Sans")
+                                                                      "font-family" = "Fira Sans"),
+   ".labeltext" = list("width" = "auto",
+                       "text-align" = "center",
+                       "border" = "none")
    
   )
 )
