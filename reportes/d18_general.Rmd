@@ -681,13 +681,12 @@ ggplot(d, aes(x = n, y = participacion, color=factor(year), fill=factor(year)), 
 ```
 ]
 .pull-right[
-- La región del Maule en general votó menos que en el 2017.
+- En la mayoria de las elecciones, **comunas más chicas votaban más**.
 
-- Linares, Cauquenes, Parral y San Javier son las comunas con más inscritos.
+- El 2017, la participación se estabilizó, independiente del tamaño de la comuna.
 
-- **Linares** es la comuna con **mayor** % de votación en 2020.
+- Para el **plebiscito 2020**, comunas más grandes votaron más que las más pequeñas
 
-- **Retiro, Longaví,** y **Chanco** son las con **menor** participación en el plebiscito.
 ]
 ---
 background-position: 50% 50%
@@ -696,3 +695,49 @@ class: left, bottom, inverse
 Evolución de votaciones según tendencia política
 ]
 
+---
+# Votación en el plebiscito
+
+```{r votos2012, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+votos2020 = read.csv
+
+D18 <- sp::spTransform(d18,PRO)
+
+D18 = merge(D18, d[d$year==2012,], by='cod_comuna')
+
+D18$votantes_distrito = round(D18$n/sum(D18$n),3)
+
+
+D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
+                    "<br/>% Participación: ",round(D18$participacion,3))
+
+centers <- data.frame(gCentroid(D18, byid = TRUE))
+D18$x <- centers$x
+D18$y <- centers$y
+
+#
+
+m <- leaflet(D18) %>%
+    addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    fillColor = ~pal(participacion),
+    highlightOptions = highlightOptions(color = "white", weight = 2,
+      bringToFront = TRUE),
+      label = ~lapply(label, htmltools::HTML), 
+     labelOptions = labelOptions(
+     style = list("font-weight" = "normal", padding = "3px 8px"),
+     textsize = "15px",
+     direction = "right")
+    )%>%
+  addLegend(position = "bottomleft",
+            pal = pal, values = seq(0.3,0.75,0.1),
+            title = "Participacion",
+            opacity = 1, bins = 5
+  ) 
+
+m
+
+```
