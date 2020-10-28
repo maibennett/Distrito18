@@ -745,7 +745,9 @@ m <- leaflet(D18) %>%
 m
 
 ```
-
+.pull-right[
+- **Linares, San Javier** y **Colbún** fueron las comunas con mayor porcentaje de "Apruebo"
+]
 ---
 # Votación en el plebiscito (N Apruebo)
 
@@ -783,7 +785,11 @@ m <- leaflet(D18) %>%
 m
 
 ```
+.pull-right[
+- En términos de votos, **Linares** es por lejos la que tiene mayor cantidad de votos para el "Apruebo".
 
+- San Javier y Parral también concentran una cantidad importante de votos para el "Apruebo".
+]
 ---
 # Elección COREs 2017 (%)
 
@@ -798,9 +804,11 @@ labels_top = unique(cores2017$Pacto)[c(6,1,2,3,7,4,5)]
 fig <- plot_ly(cores2017_wide1, x = ~`FRENTE AMPLIO`, y = ~COMUNA, 
                type = 'bar', orientation = 'h', name = "FA",
         marker = list(color = alpha("#0D0887",0.5),
-                      line = list(color = "#0D0887", width = 1))) 
+                      line = list(color = "#0D0887", width = 2))) 
 fig <- fig %>% add_trace(x = ~`POR TODO CHILE`, 
-                         marker = list(color = "#5601A4"), name="Por Todo Chile") 
+                         marker = list(color = alpha("#5601A4",0.5),
+                                       line = list(color = "#5601A4", width = 2)), 
+                         name="Por Todo Chile") 
 fig <- fig %>% add_trace(x = ~`POR UN CHILE JUSTO Y DESCENTRALIZADO`, 
                          marker = list(color = "#900DA4"), 
                          name="Por un Chile Justo y Centralizado") 
@@ -813,6 +821,11 @@ fig <- fig %>% add_trace(x = ~`CHILE VAMOS RN - EVOPOLI`, marker = list(color = 
                          name = "Chile Vamos (RN + Evopoli)") 
 fig <- fig %>% add_trace(x = ~`CHILE VAMOS UDI - PRI - INDEPENDIENTES`, 
                          marker = list(color = "#FCCE25"), name="Chile Vamos (UDI + PRI)") 
+fig <- fig %>% add_segments(x = 0.5, xend = 0.5, y = "Cauquenes", yend = "Yerbas Buenas",
+                             line=list(width=3, dash="dash", color = "#575555"),
+                            marker = list(color = alpha("#FFFFFF",0),
+                                          line = list(color = alpha("#FFFFFF",0))),
+                            name="50 %")
 fig <- fig %>% layout(xaxis = list(title = "",
                       showgrid = FALSE,
                       showline = FALSE,
@@ -825,7 +838,7 @@ fig <- fig %>% layout(xaxis = list(title = "",
                       showticklabels = FALSE,
                       zeroline = FALSE),
          barmode = 'stack',
-         paper_bgcolor = 'rgb(248, 248, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
+         paper_bgcolor = 'rgb(255, 255, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
          margin = list(l = 50, r = 10, t = 50, b = 80),
          showlegend = TRUE) 
 
@@ -854,9 +867,11 @@ labels_top = unique(cores2017$Pacto)[c(6,1,2,3,7,4,5)]
 fig <- plot_ly(cores2017_wide1, x = ~`FRENTE AMPLIO`, y = ~COMUNA, 
                type = 'bar', orientation = 'h', name = "FA",
         marker = list(color = alpha("#0D0887",0.5),
-                      line = list(color = "#0D0887", width = 1))) 
+                      line = list(color = "#0D0887", width = 2))) 
 fig <- fig %>% add_trace(x = ~`POR TODO CHILE`, 
-                         marker = list(color = "#5601A4"), name="Por Todo Chile") 
+                         marker = list(color = alpha("#5601A4",0.5),
+                                       line = list(color = "#5601A4", width = 2)), 
+                         name="Por Todo Chile") 
 fig <- fig %>% add_trace(x = ~`POR UN CHILE JUSTO Y DESCENTRALIZADO`, 
                          marker = list(color = "#900DA4"), 
                          name="Por un Chile Justo y Centralizado") 
@@ -881,7 +896,7 @@ fig <- fig %>% layout(xaxis = list(title = "",
                       showticklabels = FALSE,
                       zeroline = FALSE),
          barmode = 'stack',
-         paper_bgcolor = 'rgb(248, 248, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
+         paper_bgcolor = 'rgb(255, 255, 255)', plot_bgcolor = 'rgb(255, 255, 255)',
          margin = list(l = 50, r = 10, t = 50, b = 80),
          showlegend = TRUE) 
 
