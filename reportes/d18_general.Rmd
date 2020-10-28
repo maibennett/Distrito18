@@ -696,34 +696,38 @@ Evolución de votaciones según tendencia política
 ]
 
 ---
-# Votación en el plebiscito
+# Votación en el plebiscito (% Apruebo)
 
-```{r votos2012, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+```{r perc_votos2020, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
-votos2020 = read.csv
+votos2020 = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data/servel/votacion2020.csv")
+
+votos2020$perc_apruebo = votos2020$Apruebo/(votos2020$Total-votos2020$Nulos-votos2020$Blancos)
 
 D18 <- sp::spTransform(d18,PRO)
 
-D18 = merge(D18, d[d$year==2012,], by='cod_comuna')
-
-D18$votantes_distrito = round(D18$n/sum(D18$n),3)
+D18 = merge(D18, votos2020, by='cod_comuna')
+D18 = merge(D18, d[d$year==2020,], by='cod_comuna')
 
 
 D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
-                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
-                    "<br/>% Participación: ",round(D18$participacion,3))
+                    "<br/>% Participación: ",round(D18$participacion,3),
+                   "<br/>% Apruebo: ",round(D18$perc_apruebo,3))
 
 centers <- data.frame(gCentroid(D18, byid = TRUE))
 D18$x <- centers$x
 D18$y <- centers$y
 
-#
+pal2 <- colorNumeric(c("#0D0887", "#5601A4",
+                      "#900DA4","#BF3984","#E16462",
+                      "#F89441","#FCCE25"), 
+                    seq(0.6,0.8,0.01))
 
 m <- leaflet(D18) %>%
     addTiles() %>%  # Add default OpenStreetMap map tiles
   addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
     opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal(participacion),
+    fillColor = ~pal2(perc_apruebo),
     highlightOptions = highlightOptions(color = "white", weight = 2,
       bringToFront = TRUE),
       label = ~lapply(label, htmltools::HTML), 
@@ -733,7 +737,7 @@ m <- leaflet(D18) %>%
      direction = "right")
     )%>%
   addLegend(position = "bottomleft",
-            pal = pal, values = seq(0.3,0.75,0.1),
+            pal = pal2, values = seq(0.6,0.8,0.05),
             title = "Participacion",
             opacity = 1, bins = 5
   ) 
@@ -741,3 +745,42 @@ m <- leaflet(D18) %>%
 m
 
 ```
+
+---
+# Votación en el plebiscito (N Apruebo)
+
+```{r n_votos2020, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+
+pal3 <- colorNumeric(c("#0D0887", "#5601A4",
+                      "#900DA4","#BF3984","#E16462",
+                      "#F89441","#FCCE25"), 
+                    seq(0,26000,2000))
+
+D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+                    "<br/>% Participación: ",round(D18$participacion,3),
+                   "<br/>N Apruebo: ",D18$Apruebo)
+
+m <- leaflet(D18) %>%
+    addTiles() %>%  # Add default OpenStreetMap map tiles
+  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    fillColor = ~pal3(Apruebo),
+    highlightOptions = highlightOptions(color = "white", weight = 2,
+      bringToFront = TRUE),
+      label = ~lapply(label, htmltools::HTML), 
+     labelOptions = labelOptions(
+     style = list("font-weight" = "normal", padding = "3px 8px"),
+     textsize = "15px",
+     direction = "right")
+    )%>%
+  addLegend(position = "bottomleft",
+            pal = pal3, values = seq(1700,27000,2000),
+            title = "Participacion",
+            opacity = 1, bins = 5
+  ) 
+
+m
+
+```
+
