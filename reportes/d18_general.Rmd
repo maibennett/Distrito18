@@ -738,7 +738,7 @@ m <- leaflet(D18) %>%
     )%>%
   addLegend(position = "bottomleft",
             pal = pal2, values = seq(0.6,0.8,0.05),
-            title = "Participacion",
+            title = "% Apruebo",
             opacity = 1, bins = 5
   ) 
 
@@ -776,7 +776,7 @@ m <- leaflet(D18) %>%
     )%>%
   addLegend(position = "bottomleft",
             pal = pal3, values = seq(1700,27000,2000),
-            title = "Participacion",
+            title = "N Votos Apruebo",
             opacity = 1, bins = 5
   ) 
 
