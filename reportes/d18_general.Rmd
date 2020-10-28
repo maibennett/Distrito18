@@ -784,3 +784,116 @@ m
 
 ```
 
+---
+# Elección COREs 2017 (%)
+
+```{r perc_cores2017, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+cores2017 = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_core2017.csv")
+
+cores2017_wide1 = pivot_wider(cores2017, id_cols = c(COMUNA, Pacto), names_from = Pacto, values_from = perc_votos)
+
+labels_top = unique(cores2017$Pacto)[c(6,1,2,3,7,4,5)]
+
+fig <- plot_ly(cores2017_wide1, x = ~`FRENTE AMPLIO`, y = ~COMUNA, 
+               type = 'bar', orientation = 'h', name = "FA",
+        marker = list(color = alpha("#0D0887",0.5),
+                      line = list(color = "#0D0887", width = 1))) 
+fig <- fig %>% add_trace(x = ~`POR TODO CHILE`, 
+                         marker = list(color = "#5601A4"), name="Por Todo Chile") 
+fig <- fig %>% add_trace(x = ~`POR UN CHILE JUSTO Y DESCENTRALIZADO`, 
+                         marker = list(color = "#900DA4"), 
+                         name="Por un Chile Justo y Centralizado") 
+fig <- fig %>% add_trace(x = ~`UNIDOS POR LA DESCENTRALIZACION`, 
+                         marker = list(color = "#BF3984"), 
+                         name = "Unidos por la Descentralizacion") 
+fig <- fig %>% add_trace(x = ~`SUMEMOS`, marker = list(color = "#E16462"),
+                         name = "Sumemos") 
+fig <- fig %>% add_trace(x = ~`CHILE VAMOS RN - EVOPOLI`, marker = list(color = "#F89441"),
+                         name = "Chile Vamos (RN + Evopoli)") 
+fig <- fig %>% add_trace(x = ~`CHILE VAMOS UDI - PRI - INDEPENDIENTES`, 
+                         marker = list(color = "#FCCE25"), name="Chile Vamos (UDI + PRI)") 
+fig <- fig %>% layout(xaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      showticklabels = FALSE,
+                      zeroline = FALSE,
+                      domain = c(0.15, 1)),
+         yaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      showticklabels = FALSE,
+                      zeroline = FALSE),
+         barmode = 'stack',
+         paper_bgcolor = 'rgb(248, 248, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
+         margin = list(l = 50, r = 10, t = 50, b = 80),
+         showlegend = TRUE) 
+
+
+fig <- fig %>% add_annotations(xref = 'paper', yref = 'y', x = 0.14, y = ~COMUNA,
+                  xanchor = 'right',
+                  text = ~COMUNA,
+                  font = list(family = 'Roboto', size = 12,
+                            color = 'rgb(67, 67, 67)'),
+                  showarrow = FALSE, align = 'right') 
+
+
+fig
+```
+
+
+---
+# Elección COREs 2017 (Num. Votos)
+
+```{r n_cores2017, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
+
+cores2017_wide1 = pivot_wider(cores2017, id_cols = c(COMUNA, Pacto), names_from = Pacto, values_from = n_votos)
+
+labels_top = unique(cores2017$Pacto)[c(6,1,2,3,7,4,5)]
+
+fig <- plot_ly(cores2017_wide1, x = ~`FRENTE AMPLIO`, y = ~COMUNA, 
+               type = 'bar', orientation = 'h', name = "FA",
+        marker = list(color = alpha("#0D0887",0.5),
+                      line = list(color = "#0D0887", width = 1))) 
+fig <- fig %>% add_trace(x = ~`POR TODO CHILE`, 
+                         marker = list(color = "#5601A4"), name="Por Todo Chile") 
+fig <- fig %>% add_trace(x = ~`POR UN CHILE JUSTO Y DESCENTRALIZADO`, 
+                         marker = list(color = "#900DA4"), 
+                         name="Por un Chile Justo y Centralizado") 
+fig <- fig %>% add_trace(x = ~`UNIDOS POR LA DESCENTRALIZACION`, 
+                         marker = list(color = "#BF3984"), 
+                         name = "Unidos por la Descentralizacion") 
+fig <- fig %>% add_trace(x = ~`SUMEMOS`, marker = list(color = "#E16462"),
+                         name = "Sumemos") 
+fig <- fig %>% add_trace(x = ~`CHILE VAMOS RN - EVOPOLI`, marker = list(color = "#F89441"),
+                         name = "Chile Vamos (RN + Evopoli)") 
+fig <- fig %>% add_trace(x = ~`CHILE VAMOS UDI - PRI - INDEPENDIENTES`, 
+                         marker = list(color = "#FCCE25"), name="Chile Vamos (UDI + PRI)") 
+fig <- fig %>% layout(xaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      showticklabels = FALSE,
+                      zeroline = FALSE,
+                      domain = c(0.15, 1)),
+         yaxis = list(title = "",
+                      showgrid = FALSE,
+                      showline = FALSE,
+                      showticklabels = FALSE,
+                      zeroline = FALSE),
+         barmode = 'stack',
+         paper_bgcolor = 'rgb(248, 248, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
+         margin = list(l = 50, r = 10, t = 50, b = 80),
+         showlegend = TRUE) 
+
+
+fig <- fig %>% add_annotations(xref = 'paper', yref = 'y', x = 0.14, y = ~COMUNA,
+                  xanchor = 'right',
+                  text = ~COMUNA,
+                  font = list(family = 'Roboto', size = 12,
+                            color = 'rgb(67, 67, 67)'),
+                  showarrow = FALSE, align = 'right') 
+
+
+fig
+```
+
