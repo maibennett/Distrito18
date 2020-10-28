@@ -697,7 +697,7 @@ Evolución de votaciones según tendencia política
 
 ---
 # Votación en el plebiscito (% Apruebo)
-
+.pull-left[
 ```{r perc_votos2020, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
 votos2020 = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data/servel/votacion2020.csv")
@@ -745,12 +745,13 @@ m <- leaflet(D18) %>%
 m
 
 ```
+]
 .pull-right[
 - **Linares, San Javier** y **Colbún** fueron las comunas con mayor porcentaje de "Apruebo"
 ]
 ---
 # Votación en el plebiscito (N Apruebo)
-
+.pull-left[
 ```{r n_votos2020, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
 
@@ -785,6 +786,7 @@ m <- leaflet(D18) %>%
 m
 
 ```
+]
 .pull-right[
 - En términos de votos, **Linares** es por lejos la que tiene mayor cantidad de votos para el "Apruebo".
 
