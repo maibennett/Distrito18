@@ -17,7 +17,7 @@ output:
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
-knitr::opts_chunk$set(fig.showtext = TRUE)
+knitr::opts_chunk$set(fig.showtext = TRUE, cache = TRUE)
 ```
 
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
@@ -805,8 +805,7 @@ fig <- plot_ly(cores2017_wide1, x = ~`FRENTE AMPLIO`, y = ~COMUNA,
                type = 'bar', orientation = 'h', name = "FA",
         marker = list(color = alpha("#0D0887",0.5),
                       line = list(color = "#0D0887", width = 2))) 
-fig <- fig %>% add_trace(x = ~`POR TODO CHILE`, 
-                         marker = list(color = alpha("#5601A4",0.5),
+fig <- fig %>% add_trace(x = ~`POR TODO CHILE`, marker = list(color = alpha("#5601A4",0.5),
                                        line = list(color = "#5601A4", width = 2)), 
                          name="Por Todo Chile") 
 fig <- fig %>% add_trace(x = ~`POR UN CHILE JUSTO Y DESCENTRALIZADO`, 
@@ -838,7 +837,7 @@ fig <- fig %>% layout(xaxis = list(title = "",
                       showticklabels = FALSE,
                       zeroline = FALSE),
          barmode = 'stack',
-         paper_bgcolor = 'rgb(255, 255, 255)', plot_bgcolor = 'rgb(248, 248, 255)',
+         paper_bgcolor = 'rgb(255, 255, 255)', plot_bgcolor = 'rgb(255, 255, 255)',
          margin = list(l = 50, r = 10, t = 50, b = 80),
          showlegend = TRUE) 
 
