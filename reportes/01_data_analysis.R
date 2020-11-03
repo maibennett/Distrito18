@@ -57,6 +57,15 @@ d2017 = d2017 %>%
                                      ifelse(RANGO_EDAD %in% rango_edad_mayor,3,NA))))
 
 
+## For exporting
+
+d2017_export = d2017 %>% group_by(REGION,COMUNA,RANGO_EDAD,rango_edad3) %>% 
+  summarise(n = sum(!is.na(SUFRAGIO)), vote = sum(SUFRAGIO == "sufragó"))
+
+d2017_export$participacion2017 = d2017_export$vote/d2017_export$n
+
+######
+
 d2017_comuna = d2017 %>% group_by(REGION,COMUNA,rango_edad3) %>% 
   summarise(n = sum(!is.na(SUFRAGIO)), vote = sum(SUFRAGIO == "sufragó"))
 
@@ -81,6 +90,25 @@ d2020_padron = d2020_padron %>%
                                      ifelse(RANGO_EDAD %in% rango_edad_mayor,3,NA))))
 
 d2020_padron = d2020_padron[d2020_padron$COMUNA!="",]
+
+### For exporting
+d2020_export = d2020_padron %>% group_by(REGION,COMUNA,RANGO_EDAD,rango_edad3) %>% 
+  summarise(n = sum(!is.na(rango_edad3)))
+
+d2020_export = d2020_export[,c("COMUNA","RANGO_EDAD","n")]
+
+names(d2020_export) = c("COMUNA","RANGO_EDAD","n2020")
+
+d_export = left_join(d2017_export,d2020_export,by=c("COMUNA","RANGO_EDAD"))
+
+d_export = d_export[d_export$REGION=="Del Maule",]
+
+comunas_d18 = c("Cauquenes","Chanco","Colbun","Linares","Longavi","Parral",
+                "Pelluhue","Retiro","San Javier","Villa Alegre","Yerbas Buenas")
+
+d_export = d_export[d_export$COMUNA %in% comunas_d18,]
+
+#######
 
 d2020_padron_comuna = d2020_padron %>% group_by(REGION,COMUNA,rango_edad3) %>% 
   summarise(n = sum(!is.na(rango_edad3)))
