@@ -29,6 +29,14 @@ d2017 = read.csv(paste0(dir_data,"data_original/VW_VOTARON_2017_1V.csv"), sep = 
 d2020_padron = read.csv(paste0(dir_data,"data_original/PADRON2020.csv"), sep = ";", header = TRUE, encoding = "UTF-8")
 d2020_comuna = read.csv(paste0(dir_data,"data_original/votacion2020.csv"), header = TRUE)
 
+URLd18 = "https://raw.githubusercontent.com/maibennett/d18/main/data/otros/d_export.csv"
+URLd18_listas = "https://raw.githubusercontent.com/maibennett/d18/main/data/otros/resultados_core2017.csv"
+URLd18_derecha = "https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_core2017_derecha.csv"
+
+d = read.csv(URLd18)
+d_listas = read.csv(URLd18_listas)
+d_derecha = read.csv(URLd18_derecha)
+
 ###########################
 
 ####### Data etapas COVID (https://docs.google.com/spreadsheets/d/1WieweYNSPdpmjUIyYcbKp1oaqwlnD61_/edit?usp=drive_web&ouid=117681751153105889471&dls=true)
@@ -118,7 +126,7 @@ d2020_padron_comuna = d2020_padron_comuna %>% pivot_wider(id_cols = c(COMUNA, ra
                                                           names_from = rango_edad3,
                                                           values_from = n)
 
-names(d2020_padron_comuna) = c("REGION","COMUNA","n_1","n_2","n_3")
+names(d2020_padron_comuna) = c("COMUNA","n_1","n_2","n_3")
 
 # Cambiar comunas que tienen distinto nombre:
 d2020_padron_comuna$COMUNA[d2020_padron_comuna$COMUNA=="Aysen"] = "Aisen"
@@ -129,7 +137,7 @@ d2020_padron_comuna$COMUNA[d2020_padron_comuna$COMUNA=="Llaillay"] = "Llay-Llay"
 
 # Votacion 2020
 
-names(d2020_comuna) = c("REGION","COMUNA","n_mesas","n","vote","participacion")
+names(d2020_comuna) = c("COMUNA","n_mesas","n","vote","participacion")
 d2020_comuna = d2020_comuna[,c("COMUNA","n","vote","participacion")]
 
 d2020_comuna$year = 2020
@@ -141,13 +149,13 @@ d2020_comuna = left_join(d2020_comuna,d2020_padron_comuna, by="COMUNA")
 d2020_comuna = d2020_comuna %>% mutate(vote_1 = 0, vote_2 = 0, vote_3 = 0,
                                        participacion_1 = 0, participacion_2 = 0,
                                        participacion_3 = 0) %>%
-  relocate(REGION,COMUNA,n_1,n_2,n_3,vote_1,vote_2,vote_3,participacion_1,participacion_2,
+  relocate(COMUNA,n_1,n_2,n_3,vote_1,vote_2,vote_3,participacion_1,participacion_2,
            participacion_3, year)
 
 # Merge 
 
-d = data.frame(rbind(d2017_comuna,
-                     d2020_comuna))
+d_all = data.frame(rbind(d2017_comuna,
+                         d2020_comuna))
 
 # Etapas COVID
 etapas$group_etapa_plebiscito = NA
@@ -155,17 +163,41 @@ etapas$group_etapa_plebiscito[etapas$X24.Oct<=2] = 1
 etapas$group_etapa_plebiscito[etapas$X24.Oct>2] = 0
 
 
-d = left_join(d, etapas[,c("COMUNA","CUT","X24.Oct","group_etapa_plebiscito")], by = "COMUNA")
+d_all = left_join(d_all, etapas[,c("COMUNA","CUT","X24.Oct","group_etapa_plebiscito")], by = "COMUNA")
 
-d = d %>% rename(cod_comuna = CUT)
+d_all = d_all %>% rename(cod_comuna = CUT)
 
-d = left_join(d, casen, by="cod_comuna")
+d_all = left_join(d_all, casen, by="cod_comuna")
 
 ## Efecto pandemia y efecto plebiscito:
 
-d$p1 = d$n_1/d$n
-d$p2 = d$n_2/d$n
-d$p3 = d$n_3/d$n
+d_all$p1 = d_all$n_1/d_all$n
+d_all$p2 = d_all$n_2/d_all$n
+d_all$p3 = d_all$n_3/d_all$n
 
-lm1 = lm(participacion ~ n + p1*factor(year) + p2*factor(year)
-         + p3*factor(year) + factor(year) + yautcorh, data = d[d$REGION=="Del Maule",])
+d_all = left_join(d_all,d_derecha,by="COMUNA")
+
+lm1 = lm(participacion ~ n + yautcorh + factor(year)*(
+  p1 + p3 + p_derecha2017 + group_etapa_plebiscito), 
+  data = d_all)
+
+sum_lm = summary(lm1)
+sum_lm
+
+comunas_d18 = unique(d$COMUNA)
+
+d_18 = d_all[(d_all$COMUNA %in% comunas_d18) & d_all$year==2020,]
+
+efecto_covid = sum_lm$coefficients[4,1] +
+  sum_lm$coefficients[10,1]*d_18$p3 + 
+  sum_lm$coefficients[12,1]*d_18$group_etapa_plebiscito
+
+
+efecto_plebiscito = sum_lm$coefficients[9,1]*d_18$p1 + 
+  sum_lm$coefficients[11,1]*d_18$p_derecha2017
+
+
+efectos = as.data.frame(cbind(d_18$COMUNA,efecto_covid,efecto_plebiscito))
+names(efectos) = c("COMUNA","EfectoCOVID","EfectoPlebiscito")
+
+write.csv(efectos,file="C:/Users/mc72574/Dropbox/Distrito18/data/otros/efectos.csv")
