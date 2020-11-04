@@ -30,3 +30,5 @@
 ### Simulaciones
 
 SImulaciones para distintos escenarios [aca](https://maibennett.shinyapps.io/distrito18/)
+
+<iframe src="https://maibennett.shinyapps.io/distrito18/" width="100%" height="900px"></iframe>
