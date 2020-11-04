@@ -1,10 +1,8 @@
-# Reportes
+# Reportes para Distrito 18
 
-### Link
+### Presentación
 
-[slide link](reportes/d18_general.html)
-
-### Embed
+[Link a la presentacion](reportes/d18_general.html)
 
 <style>
 .resp-container {
@@ -28,3 +26,7 @@
       Oops! Your browser doesn't suppor this.
     </iframe>
 </div>
+
+### Simulaciones
+
+SImulaciones para distintos escenarios [aca](https://maibennett.shinyapps.io/distrito18/)
