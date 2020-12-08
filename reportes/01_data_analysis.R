@@ -25,6 +25,7 @@ dir_data = "C:/Users/mc72574/Dropbox/covid/participacion/"
 
 ######## Data participacion (bajada del servel)
 
+d2016 = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data/servel/PARTICIPACION_2016_D18.csv", sep = ",", header = TRUE)
 d2017 = read.csv(paste0(dir_data,"data_original/VW_VOTARON_2017_1V.csv"), sep = ";", header = TRUE)
 d2020_padron = read.csv(paste0(dir_data,"data_original/PADRON2020.csv"), sep = ";", header = TRUE, encoding = "UTF-8")
 d2020_comuna = read.csv(paste0(dir_data,"data_original/votacion2020.csv"), header = TRUE)
@@ -73,6 +74,14 @@ d2017 = d2017 %>%
                                      ifelse(RANGO_EDAD %in% rango_edad_mayor,3,NA))))
 
 
+d2016 = d2016[d2016$COMUNA!="",]
+
+d2016 = d2016 %>% 
+  mutate(rango_edad3 = ifelse(RANGO_EDAD %in% rango_edad_joven,1,
+                              ifelse(RANGO_EDAD %in% rango_edad_medio,2,
+                                     ifelse(RANGO_EDAD %in% rango_edad_mayor,3,NA))))
+
+
 ## For exporting
 
 # d2017_export = d2017 %>% group_by(REGION,COMUNA,RANGO_EDAD,rango_edad3) %>% 
@@ -80,7 +89,7 @@ d2017 = d2017 %>%
 # 
 # d2017_export$participacion2017 = d2017_export$vote/d2017_export$n
 
-######
+###### 2017
 
 d2017_comuna = d2017 %>% group_by(REGION,COMUNA,rango_edad3) %>% 
   summarise(n = sum(!is.na(SUFRAGIO)), vote = sum(SUFRAGIO == "sufragó"))
@@ -97,6 +106,25 @@ d2017_comuna = d2017_comuna %>% mutate(n = n_1+n_2+n_3,
 
 
 d2017_comuna$year = 2017
+
+
+###### 2016
+
+d2016_comuna = d2016 %>% group_by(REGION,COMUNA,rango_edad3) %>% 
+  summarise(n = sum(!is.na(SUFRAGIO)), vote = sum(SUFRAGIO == "sufragó"))
+
+d2016_comuna$participacion = d2016_comuna$vote/d2016_comuna$n
+
+d2016_comuna = d2016_comuna %>% pivot_wider(id_cols = c(COMUNA, rango_edad3),
+                                            names_from = rango_edad3,
+                                            values_from = c(n, vote, participacion))
+
+d2016_comuna = d2016_comuna %>% mutate(n = n_1+n_2+n_3,
+                                       vote = vote_1+vote_2+vote_3,
+                                       participacion = vote/n)
+
+
+d2016_comuna$year = 2016
 
 # 2020
 
@@ -152,7 +180,7 @@ d2020_comuna$year = 2020
 
 d2020_comuna = left_join(d2020_comuna,d2020_padron_comuna, by="COMUNA")
 
-# No tenemos datos de votacion por grupo etario por grupo etario, asi que incluyo 0s
+# No tenemos datos de votacion por grupo etario, asi que incluyo 0s
 
 d2020_comuna = d2020_comuna %>% mutate(vote_1 = 0, vote_2 = 0, vote_3 = 0,
                                        participacion_1 = 0, participacion_2 = 0,
@@ -162,7 +190,8 @@ d2020_comuna = d2020_comuna %>% mutate(vote_1 = 0, vote_2 = 0, vote_3 = 0,
 
 # Merge 
 
-d_all = data.frame(rbind(d2017_comuna,
+d_all = data.frame(rbind(d2016_comuna,
+                         d2017_comuna,
                          d2020_comuna))
 
 # Etapas COVID
@@ -187,7 +216,7 @@ d_all = left_join(d_all,d_derecha,by="COMUNA")
 
 lm1 = lm(participacion ~ n + yautcorh + factor(year)*(
   p1 + p3 + p_derecha2017 + group_etapa_plebiscito), 
-  data = d_all)
+  data = d_all[d_all$year!=2016])
 
 sum_lm = summary(lm1)
 sum_lm
