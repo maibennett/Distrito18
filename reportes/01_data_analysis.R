@@ -212,10 +212,23 @@ d_all$p1 = d_all$n_1/d_all$n
 d_all$p2 = d_all$n_2/d_all$n
 d_all$p3 = d_all$n_3/d_all$n
 
-d_all = left_join(d_all,d_derecha,by="COMUNA")
+d_all = left_join(d_all,d_derecha_cores,by="COMUNA")
+d_all = d_all %>% rename(Votos_der_cores = Votos_der,
+                         Votos_cores = Votos,
+                         p_derecha_cores = p_derecha)
+
+d_all = left_join(d_all,d_derecha_diputados,by="COMUNA")
+d_all = d_all %>% rename(Votos_der_dip = Votos_der,
+                         Votos_dip = Votos,
+                         p_derecha_dip = p_derecha)
+
+d_all = left_join(d_all,d_derecha_concejales,by="COMUNA")
+d_all = d_all %>% rename(Votos_der_con = Votos_der,
+                         Votos_con = Votos,
+                         p_derecha_con = p_derecha)
 
 lm1 = lm(participacion ~ n + yautcorh + factor(year)*(
-  p1 + p3 + p_derecha2017 + group_etapa_plebiscito), 
+  p1 + p3 + p_derecha_cores + group_etapa_plebiscito), 
   data = d_all[d_all$year!=2016])
 
 sum_lm = summary(lm1)
