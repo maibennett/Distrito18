@@ -229,7 +229,7 @@ d_all = d_all %>% rename(Votos_der_con = Votos_der,
 
 lm1 = lm(participacion ~ n + yautcorh + factor(year)*(
   p1 + p3 + p_derecha_cores + group_etapa_plebiscito), 
-  data = d_all[d_all$year!=2016])
+  data = d_all[d_all$year!=2016,])
 
 sum_lm = summary(lm1)
 sum_lm
@@ -244,7 +244,7 @@ efecto_covid = sum_lm$coefficients[4,1] +
 
 
 efecto_plebiscito = sum_lm$coefficients[9,1]*d_18$p1 + 
-  sum_lm$coefficients[11,1]*d_18$p_derecha2017
+  sum_lm$coefficients[11,1]*d_18$p_derecha_cores
 
 
 efectos = as.data.frame(cbind(d_18$COMUNA,d_18$participacion,efecto_covid,efecto_plebiscito))
