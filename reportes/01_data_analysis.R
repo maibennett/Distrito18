@@ -30,12 +30,20 @@ d2020_padron = read.csv(paste0(dir_data,"data_original/PADRON2020.csv"), sep = "
 d2020_comuna = read.csv(paste0(dir_data,"data_original/votacion2020.csv"), header = TRUE)
 
 URLd18 = "https://raw.githubusercontent.com/maibennett/d18/main/data/otros/d_export.csv"
-URLd18_listas = "https://raw.githubusercontent.com/maibennett/d18/main/data/otros/resultados_core2017.csv"
-URLd18_derecha = "https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_core2017_derecha.csv"
+URLd18_listas_cores = "https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_core2017_candidatos.csv"
+URLd18_derecha_cores = "https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_core2017_derecha.csv"
+URLd18_listas_diputados = "https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_diputados2017_candidatos.csv"
+URLd18_derecha_diputados = "https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_diputados2017_derecha.csv"
+URLd18_listas_concejales = "https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_concejales2016_candidatos.csv"
+URLd18_derecha_concejales = "https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_concejales2016_derecha.csv"
 
 d = read.csv(URLd18)
-d_listas = read.csv(URLd18_listas)
-d_derecha = read.csv(URLd18_derecha)
+d_listas_cores = read.csv(URLd18_listas_cores)
+d_derecha_cores = read.csv(URLd18_derecha_cores)
+d_listas_diputados = read.csv(URLd18_listas_diputados)
+d_derecha_diputados = read.csv(URLd18_derecha_diputados)
+d_listas_concejales = read.csv(URLd18_listas_concejales)
+d_derecha_concejales = read.csv(URLd18_derecha_concejales)
 
 ###########################
 
