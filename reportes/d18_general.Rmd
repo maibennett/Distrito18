@@ -370,7 +370,7 @@ d = d[d$cod_comuna %in% comunas_d18,]
 #D18 <- sp::spTransform(d18,PRO)
 
 url <- 'https://raw.githubusercontent.com/pachamaltese/chilemapas/master/data_geojson/comunas/r07.geojson'
-comunas_r07 <- rgdal::readOGR(url)
+comunas_r07 <- rgdal::readOGR(url,verbose=FALSE)
 
 centroids <- coordinates(comunas_r07)
 
@@ -417,7 +417,7 @@ base_map <- leaflet() %>%
                 addProviderTiles("CartoDB.Positron")
 
 map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
-                                            color = "#b2aeae", # you need to use hex colors
+                                            color = "#ffffff", # you need to use hex colors
                                             fillOpacity = 0.8, 
                                             weight = 1, 
                                             smoothFactor = 0.2,
@@ -480,7 +480,7 @@ base_map <- leaflet() %>%
                 addProviderTiles("CartoDB.Positron")
 
 map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
-                                            color = "#b2aeae", # you need to use hex colors
+                                            color = "#ffffff", # you need to use hex colors
                                             fillOpacity = 0.8, 
                                             weight = 1, 
                                             smoothFactor = 0.2,
@@ -541,7 +541,7 @@ base_map <- leaflet() %>%
                 addProviderTiles("CartoDB.Positron")
 
 map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
-                                            color = "#b2aeae", # you need to use hex colors
+                                            color = "#ffffff", # you need to use hex colors
                                             fillOpacity = 0.8, 
                                             weight = 1, 
                                             smoothFactor = 0.2,
@@ -602,7 +602,7 @@ base_map <- leaflet() %>%
                 addProviderTiles("CartoDB.Positron")
 
 map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
-                                            color = "#b2aeae", # you need to use hex colors
+                                            color = "#ffffff", # you need to use hex colors
                                             fillOpacity = 0.8, 
                                             weight = 1, 
                                             smoothFactor = 0.2,
@@ -660,7 +660,7 @@ base_map <- leaflet() %>%
                 addProviderTiles("CartoDB.Positron")
 
 map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
-                                            color = "#b2aeae", # you need to use hex colors
+                                            color = "#ffffff", # you need to use hex colors
                                             fillOpacity = 0.8, 
                                             weight = 1, 
                                             smoothFactor = 0.2,
@@ -771,7 +771,7 @@ base_map <- leaflet() %>%
                 addProviderTiles("CartoDB.Positron")
 
 map <- base_map %>% addPolygons(data = D18, fillColor = ~pal2(perc_apruebo), 
-                                            color = "#b2aeae", # you need to use hex colors
+                                            color = "#ffffff", # you need to use hex colors
                                             fillOpacity = 0.8, 
                                             weight = 1, 
                                             smoothFactor = 0.2,
@@ -815,7 +815,7 @@ base_map <- leaflet() %>%
                 addProviderTiles("CartoDB.Positron")
 
 map <- base_map %>% addPolygons(data = D18, fillColor = ~pal3(Apruebo), 
-                                            color = "#b2aeae", # you need to use hex colors
+                                            color = "#ffffff", # you need to use hex colors
                                             fillOpacity = 0.8, 
                                             weight = 1, 
                                             smoothFactor = 0.2,
@@ -845,6 +845,9 @@ map
 ```{r perc_cores2017, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
 cores2017 = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data/servel/resultados_core2017.csv")
+
+cores2017 = cores2017 %>% group_by(COMUNA, Pacto) %>% summarise(n_votos = sum(n_votos),
+                                                                perc_votos = sum(perc_votos))
 
 cores2017_wide1 = pivot_wider(cores2017, id_cols = c(COMUNA, Pacto), names_from = Pacto, values_from = perc_votos)
 
