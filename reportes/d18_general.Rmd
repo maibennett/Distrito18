@@ -355,6 +355,7 @@ library(leaflet)
 library(OpenStreetMap)
 library(rgdal)
 library(rgeos)
+library(sp)
 
 d = read.csv("https://raw.githubusercontent.com/maibennett/participacion/main/data/d2012-2020_clean.csv")
 
@@ -362,13 +363,40 @@ comunas_d18 = unique(d_census$cod_comuna)
 
 d = d[d$cod_comuna %in% comunas_d18,]
 
-d18 <- readOGR("shp/d18.shp",
-  layer = "d18",verbose = FALSE)
+#d18 <- readOGR("shp/d18.shp",
+#  layer = "d18",verbose = FALSE)
 
-PRO <- sp::CRS('+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0')
-D18 <- sp::spTransform(d18,PRO)
+#PRO <- sp::CRS('+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0')
+#D18 <- sp::spTransform(d18,PRO)
+
+url <- 'https://raw.githubusercontent.com/pachamaltese/chilemapas/master/data_geojson/comunas/r07.geojson'
+comunas_r07 <- rgdal::readOGR(url)
+
+centroids <- coordinates(comunas_r07)
+
+#comunas_r07$x <- centroids[,1]
+#comunas_r07$y <- centroids[,2]
+
+comunas_d18v2 = as.data.frame(cbind(c("Cauquenes","Chanco","Colbun","Linares","Longavi","Parral",
+                                    "Pelluhue","Retiro","San Javier","Villa Alegre","Yerbas Buenas"),
+                                  c("07201","07202","07402","07401","07403","07404",
+                                    "07203","07405","07406","07407","07408")))
+names(comunas_d18v2) = c("COMUNA","codigo_comuna")
+
+comunas_d18 <- merge(comunas_r07,comunas_d18v2,by="codigo_comuna") 
+
+comunas_d18$x <- centroids[,1]
+comunas_d18$y <- centroids[,2]
+
+D18 = comunas_d18[!is.na(comunas_d18$COMUNA),]
+
+D18$cod_comuna = as.numeric(D18$codigo_comuna)
+
+#centers <- data.frame(gCentroid(D18, byid = TRUE))
 
 D18 = merge(D18, d[d$year==2020,], by='cod_comuna')
+
+D18$COMUNA = D18$COMUNA.x
 
 D18$votantes_distrito = round(D18$n/sum(D18$n),3)
 
@@ -377,37 +405,32 @@ pal <- colorNumeric(c("#0D0887", "#5601A4",
                       "#F89441","#FCCE25"), 
                     seq(0.3,0.75,0.05))
 
-D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+D18$label = paste0("<b>",D18$COMUNA,"</b><br/>Inscritos: ",D18$n,
                    "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
                     "<br/>% Participación: ",D18$participacion)
 
-centers <- data.frame(gCentroid(D18, byid = TRUE))
-D18$x <- centers$x
-D18$y <- centers$y
-
 #
+zoom_v = 8
 
-m <- leaflet(D18) %>%
-    addTiles() %>%  # Add default OpenStreetMap map tiles
-  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
-    opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal(participacion),
-    highlightOptions = highlightOptions(color = "white", weight = 2,
-      bringToFront = TRUE),
-      label = ~lapply(label, htmltools::HTML), 
-     labelOptions = labelOptions(
-     style = list("font-weight" = "normal", padding = "3px 8px"),
-     textsize = "15px",
-     direction = "right"),
-    options = pathOptions(clickable = TRUE)
-    )%>%
+base_map <- leaflet() %>%
+                setView(lng = -71.867, lat = -35.81, zoom = zoom_v) %>%
+                addProviderTiles("CartoDB.Positron")
+
+map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
+                                            color = "#b2aeae", # you need to use hex colors
+                                            fillOpacity = 0.8, 
+                                            weight = 1, 
+                                            smoothFactor = 0.2,
+                                popup = ~lapply(label, htmltools::HTML),
+                            popupOptions = popupOptions(maxWidth = 300, closeOnClick = TRUE)) %>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
             opacity = 1, bins = 5
-  ) 
+  )
 
-m
+
+map
 
 ```
 ]
@@ -429,42 +452,48 @@ m
 ```{r map2017, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
 
-D18 <- sp::spTransform(d18,PRO)
+D18 = comunas_d18[!is.na(comunas_d18$COMUNA),]
+
+D18$cod_comuna = as.numeric(D18$codigo_comuna)
+
+#centers <- data.frame(gCentroid(D18, byid = TRUE))
 
 D18 = merge(D18, d[d$year==2017,], by='cod_comuna')
 
+D18$COMUNA = D18$COMUNA.x
+
 D18$votantes_distrito = round(D18$n/sum(D18$n),3)
 
-D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
-                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
-                    "<br/>% Participación: ",round(D18$participacion,3))
+pal <- colorNumeric(c("#0D0887", "#5601A4",
+                      "#900DA4","#BF3984","#E16462",
+                      "#F89441","#FCCE25"), 
+                    seq(0.3,0.75,0.05))
 
-centers <- data.frame(gCentroid(D18, byid = TRUE))
-D18$x <- centers$x
-D18$y <- centers$y
+D18$label = paste0("<b>",D18$COMUNA,"</b><br/>Inscritos: ",D18$n,
+                   "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
+                    "<br/>% Participación: ",D18$participacion)
 
 #
 
-m <- leaflet(D18) %>%
-    addTiles() %>%  # Add default OpenStreetMap map tiles
-  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
-    opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal(participacion),
-    highlightOptions = highlightOptions(color = "white", weight = 2,
-      bringToFront = TRUE),
-      label = ~lapply(label, htmltools::HTML), 
-     labelOptions = labelOptions(
-     style = list("font-weight" = "normal", padding = "3px 8px"),
-     textsize = "15px",
-     direction = "right")
-    )%>%
+base_map <- leaflet() %>%
+                setView(lng = -71.867, lat = -35.81, zoom = zoom_v) %>%
+                addProviderTiles("CartoDB.Positron")
+
+map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
+                                            color = "#b2aeae", # you need to use hex colors
+                                            fillOpacity = 0.8, 
+                                            weight = 1, 
+                                            smoothFactor = 0.2,
+                                popup = ~lapply(label, htmltools::HTML),
+                            popupOptions = popupOptions(maxWidth = 300, closeOnClick = TRUE)) %>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
             opacity = 1, bins = 5
-  ) 
+  )
 
-m
+
+map
 
 ```
 ]
@@ -484,43 +513,48 @@ m
 ```{r map2016, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
 
-D18 <- sp::spTransform(d18,PRO)
+D18 = comunas_d18[!is.na(comunas_d18$COMUNA),]
+
+D18$cod_comuna = as.numeric(D18$codigo_comuna)
+
+#centers <- data.frame(gCentroid(D18, byid = TRUE))
 
 D18 = merge(D18, d[d$year==2016,], by='cod_comuna')
 
+D18$COMUNA = D18$COMUNA.x
+
 D18$votantes_distrito = round(D18$n/sum(D18$n),3)
 
+pal <- colorNumeric(c("#0D0887", "#5601A4",
+                      "#900DA4","#BF3984","#E16462",
+                      "#F89441","#FCCE25"), 
+                    seq(0.3,0.75,0.05))
 
-D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+D18$label = paste0("<b>",D18$COMUNA,"</b><br/>Inscritos: ",D18$n,
                    "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
-                    "<br/>% Participación: ",round(D18$participacion,3))
-
-centers <- data.frame(gCentroid(D18, byid = TRUE))
-D18$x <- centers$x
-D18$y <- centers$y
+                    "<br/>% Participación: ",D18$participacion)
 
 #
 
-m <- leaflet(D18) %>%
-    addTiles() %>%  # Add default OpenStreetMap map tiles
-  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
-    opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal(participacion),
-    highlightOptions = highlightOptions(color = "white", weight = 2,
-      bringToFront = TRUE),
-      label = ~lapply(label, htmltools::HTML), 
-     labelOptions = labelOptions(
-     style = list("font-weight" = "normal", padding = "3px 8px"),
-     textsize = "15px",
-     direction = "right")
-    )%>%
+base_map <- leaflet() %>%
+                setView(lng = -71.867, lat = -35.81, zoom = zoom_v) %>%
+                addProviderTiles("CartoDB.Positron")
+
+map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
+                                            color = "#b2aeae", # you need to use hex colors
+                                            fillOpacity = 0.8, 
+                                            weight = 1, 
+                                            smoothFactor = 0.2,
+                                popup = ~lapply(label, htmltools::HTML),
+                            popupOptions = popupOptions(maxWidth = 300, closeOnClick = TRUE)) %>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
             opacity = 1, bins = 5
-  ) 
+  )
 
-m
+
+map
 
 ```
 ]
@@ -540,43 +574,48 @@ m
 ```{r map2013, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
 
-D18 <- sp::spTransform(d18,PRO)
+D18 = comunas_d18[!is.na(comunas_d18$COMUNA),]
+
+D18$cod_comuna = as.numeric(D18$codigo_comuna)
+
+#centers <- data.frame(gCentroid(D18, byid = TRUE))
 
 D18 = merge(D18, d[d$year==2013,], by='cod_comuna')
 
+D18$COMUNA = D18$COMUNA.x
+
 D18$votantes_distrito = round(D18$n/sum(D18$n),3)
 
+pal <- colorNumeric(c("#0D0887", "#5601A4",
+                      "#900DA4","#BF3984","#E16462",
+                      "#F89441","#FCCE25"), 
+                    seq(0.3,0.75,0.05))
 
-D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+D18$label = paste0("<b>",D18$COMUNA,"</b><br/>Inscritos: ",D18$n,
                    "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
-                    "<br/>% Participación: ",round(D18$participacion,3))
-
-centers <- data.frame(gCentroid(D18, byid = TRUE))
-D18$x <- centers$x
-D18$y <- centers$y
+                    "<br/>% Participación: ",D18$participacion)
 
 #
 
-m <- leaflet(D18) %>%
-    addTiles() %>%  # Add default OpenStreetMap map tiles
-  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
-    opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal(participacion),
-    highlightOptions = highlightOptions(color = "white", weight = 2,
-      bringToFront = TRUE),
-      label = ~lapply(label, htmltools::HTML), 
-     labelOptions = labelOptions(
-     style = list("font-weight" = "normal", padding = "3px 8px"),
-     textsize = "15px",
-     direction = "right")
-    )%>%
+base_map <- leaflet() %>%
+                setView(lng = -71.867, lat = -35.81, zoom = zoom_v) %>%
+                addProviderTiles("CartoDB.Positron")
+
+map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
+                                            color = "#b2aeae", # you need to use hex colors
+                                            fillOpacity = 0.8, 
+                                            weight = 1, 
+                                            smoothFactor = 0.2,
+                                popup = ~lapply(label, htmltools::HTML),
+                            popupOptions = popupOptions(maxWidth = 300, closeOnClick = TRUE)) %>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
             opacity = 1, bins = 5
-  ) 
+  )
 
-m
+
+map
 
 ```
 ]
@@ -593,43 +632,48 @@ m
 ```{r map2012, fig.height=6, fig.width=8, fig.align='center', dev='svg', echo=FALSE, warning=FALSE, message=FALSE}
 
 
-D18 <- sp::spTransform(d18,PRO)
+D18 = comunas_d18[!is.na(comunas_d18$COMUNA),]
+
+D18$cod_comuna = as.numeric(D18$codigo_comuna)
+
+#centers <- data.frame(gCentroid(D18, byid = TRUE))
 
 D18 = merge(D18, d[d$year==2012,], by='cod_comuna')
 
+D18$COMUNA = D18$COMUNA.x
+
 D18$votantes_distrito = round(D18$n/sum(D18$n),3)
 
+pal <- colorNumeric(c("#0D0887", "#5601A4",
+                      "#900DA4","#BF3984","#E16462",
+                      "#F89441","#FCCE25"), 
+                    seq(0.3,0.75,0.05))
 
-D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
+D18$label = paste0("<b>",D18$COMUNA,"</b><br/>Inscritos: ",D18$n,
                    "</b><br/>% Poblacion del D18: ",D18$votantes_distrito,
-                    "<br/>% Participación: ",round(D18$participacion,3))
-
-centers <- data.frame(gCentroid(D18, byid = TRUE))
-D18$x <- centers$x
-D18$y <- centers$y
+                    "<br/>% Participación: ",D18$participacion)
 
 #
 
-m <- leaflet(D18) %>%
-    addTiles() %>%  # Add default OpenStreetMap map tiles
-  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
-    opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal(participacion),
-    highlightOptions = highlightOptions(color = "white", weight = 2,
-      bringToFront = TRUE),
-      label = ~lapply(label, htmltools::HTML), 
-     labelOptions = labelOptions(
-     style = list("font-weight" = "normal", padding = "3px 8px"),
-     textsize = "15px",
-     direction = "right")
-    )%>%
+base_map <- leaflet() %>%
+                setView(lng = -71.867, lat = -35.81, zoom = zoom_v) %>%
+                addProviderTiles("CartoDB.Positron")
+
+map <- base_map %>% addPolygons(data = D18, fillColor = ~pal(participacion), 
+                                            color = "#b2aeae", # you need to use hex colors
+                                            fillOpacity = 0.8, 
+                                            weight = 1, 
+                                            smoothFactor = 0.2,
+                                popup = ~lapply(label, htmltools::HTML),
+                            popupOptions = popupOptions(maxWidth = 300, closeOnClick = TRUE)) %>%
   addLegend(position = "bottomleft",
             pal = pal, values = seq(0.3,0.75,0.1),
             title = "Participacion",
             opacity = 1, bins = 5
-  ) 
+  )
 
-m
+
+map
 
 ```
 ]
@@ -704,7 +748,8 @@ votos2020 = read.csv("https://raw.githubusercontent.com/maibennett/d18/main/data
 
 votos2020$perc_apruebo = votos2020$Apruebo/(votos2020$Total-votos2020$Nulos-votos2020$Blancos)
 
-D18 <- sp::spTransform(d18,PRO)
+D18 = comunas_d18[!is.na(comunas_d18$COMUNA),]
+D18$cod_comuna = as.numeric(D18$codigo_comuna)
 
 D18 = merge(D18, votos2020, by='cod_comuna')
 D18 = merge(D18, d[d$year==2020,], by='cod_comuna')
@@ -714,35 +759,35 @@ D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
                     "<br/>% Participación: ",round(D18$participacion,3),
                    "<br/>% Apruebo: ",round(D18$perc_apruebo,3))
 
-centers <- data.frame(gCentroid(D18, byid = TRUE))
-D18$x <- centers$x
-D18$y <- centers$y
 
 pal2 <- colorNumeric(c("#0D0887", "#5601A4",
                       "#900DA4","#BF3984","#E16462",
                       "#F89441","#FCCE25"), 
                     seq(0.6,0.8,0.01))
 
-m <- leaflet(D18) %>%
-    addTiles() %>%  # Add default OpenStreetMap map tiles
-  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
-    opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal2(perc_apruebo),
-    highlightOptions = highlightOptions(color = "white", weight = 2,
-      bringToFront = TRUE),
-      label = ~lapply(label, htmltools::HTML), 
-     labelOptions = labelOptions(
-     style = list("font-weight" = "normal", padding = "3px 8px"),
-     textsize = "15px",
-     direction = "right")
-    )%>%
+
+base_map <- leaflet() %>%
+                setView(lng = -71.867, lat = -35.81, zoom = zoom_v) %>%
+                addProviderTiles("CartoDB.Positron")
+
+map <- base_map %>% addPolygons(data = D18, fillColor = ~pal2(perc_apruebo), 
+                                            color = "#b2aeae", # you need to use hex colors
+                                            fillOpacity = 0.8, 
+                                            weight = 1, 
+                                            smoothFactor = 0.2,
+                                popup = ~lapply(label, htmltools::HTML),
+                            popupOptions = popupOptions(maxWidth = 300, closeOnClick = TRUE)) %>%
   addLegend(position = "bottomleft",
             pal = pal2, values = seq(0.6,0.8,0.05),
             title = "% Apruebo",
             opacity = 1, bins = 5
   ) 
 
-m
+
+
+map
+
+
 
 ```
 ]
@@ -764,26 +809,28 @@ D18$label = paste0("<b>",D18$COMUNA.y,"</b><br/>Inscritos: ",D18$n,
                     "<br/>% Participación: ",round(D18$participacion,3),
                    "<br/>N Apruebo: ",D18$Apruebo)
 
-m <- leaflet(D18) %>%
-    addTiles() %>%  # Add default OpenStreetMap map tiles
-  addPolygons(color = "#444444", weight = 2, smoothFactor = 0.5,
-    opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal3(Apruebo),
-    highlightOptions = highlightOptions(color = "white", weight = 2,
-      bringToFront = TRUE),
-      label = ~lapply(label, htmltools::HTML), 
-     labelOptions = labelOptions(
-     style = list("font-weight" = "normal", padding = "3px 8px"),
-     textsize = "15px",
-     direction = "right")
-    )%>%
+
+base_map <- leaflet() %>%
+                setView(lng = -71.867, lat = -35.81, zoom = zoom_v) %>%
+                addProviderTiles("CartoDB.Positron")
+
+map <- base_map %>% addPolygons(data = D18, fillColor = ~pal3(Apruebo), 
+                                            color = "#b2aeae", # you need to use hex colors
+                                            fillOpacity = 0.8, 
+                                            weight = 1, 
+                                            smoothFactor = 0.2,
+                                popup = ~lapply(label, htmltools::HTML),
+                            popupOptions = popupOptions(maxWidth = 300, closeOnClick = TRUE)) %>%
   addLegend(position = "bottomleft",
             pal = pal3, values = seq(1700,27000,2000),
             title = "N Votos Apruebo",
             opacity = 1, bins = 5
-  ) 
+  )  
 
-m
+
+
+map
+
 
 ```
 ]
