@@ -27,7 +27,7 @@
     </iframe>
 </div>
 
-### Simulaciones
+### Simulaciones y Votaciones por Comuna
 
 SImulaciones para distintos escenarios [aca](https://maibennett.shinyapps.io/distrito18/)
 
